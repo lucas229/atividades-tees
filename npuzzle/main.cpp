@@ -32,6 +32,14 @@ bool verifyCompletion(vector <int> V){
     return true;
 }
 
+bool verifyCompletion2(vector <int> V){
+    for(int i=0; i<V.size(); i++){
+        if(V[i] != i+1 ||(i==V.size()-1 && V[i] != 0))
+            return false;
+    }
+    return true;
+}
+
 vector <estado> possibleMoves(estado V, int tamanho){
 	vector <estado> moves;
     for(int i=0; i<V.state.size(); i++){
@@ -62,7 +70,7 @@ vector <estado> possibleMoves(estado V, int tamanho){
                 iter_swap(novo.state.begin() + i, novo.state.begin() + i+1);
 			    moves.push_back(novo);
             }
-            
+            break;
         }
     }
 	return moves;
@@ -76,7 +84,7 @@ bool verifySeen(vector <int> state, vector <vector <int>> seen) {
 	}
 	return false;
 }
-
+     
 int distancia(estado est) {
     int dist = 0;
     for(int i = 0; i < tamanho * tamanho; i++) {
@@ -91,11 +99,29 @@ int distancia(estado est) {
     return dist;
 }
 
+int conflito(vector<int> est){
+    int conflitos = 0;
+    // verficar se tem conflito na coluna
+    for (int i =0; i<tamanho; i++){
+        for(int j = i; j<tamanho*tamanho; j+=tamanho){
+            // verificar se os dois números devem estar nessa coluna
+            if(est[i] % tamanho == i && est[j] % tamanho == i){
+                // verificar se ha conflito
+                if(est[i] > est[j]){
+                    conflitos ++;
+                }
+            }
+        }
+    }
+
+    return conflitos;
+}
+/*
 struct compare
 {
     bool operator()(const estado & a, const estado & b)
     {
-        return distancia(a) + a.sequencia.size() > distancia(b) + b.sequencia.size();
+        return distancia(a) + a.sequencia.size() + 2 * conflito(a.state) > distancia(b) + b.sequencia.size() + 2 * conflito(b.state);
     }
 };
 
@@ -125,22 +151,22 @@ estado solve(vector <int> puzzle, int tamanho) {
     est.sequencia = "";
     return est;
 }
+*/
 
 int main(){
-	
-    cout << "Digite o tamanho da matrix" << endl;
+    cout << "Digite o tamanho da matriz" << endl;
     cin >> tamanho >> tamanho;
 
 	vector <int> E(tamanho * tamanho);
-
     for(int i=0; i<E.size(); i++){
         cin >> E[i];
     }
 
-	estado solution = solve(E, tamanho);
-	printCurrent(solution.state, tamanho);
-    cout << endl << "Movimentos necessários: " << solution.sequencia.size() << endl;
-	cout << "Sequência: " << solution.sequencia << endl;
+    cout << conflito(E) << endl;
+	//estado solution = solve(E, tamanho);
+
+	//printCurrent(solution.state, tamanho);
+    //cout << endl << "Movimentos necessários: " << solution.sequencia.size() << endl;
+	//cout << "Sequência: " << solution.sequencia << endl;
     return 0;
 }
-
