@@ -2,10 +2,11 @@
 #include <queue>
 #include <vector>
 #include <cmath>
+#include <unordered_set>
 
 using namespace std;
-int tamanho;
 
+int tamanho;
 
 typedef struct estado
 {
@@ -14,7 +15,7 @@ typedef struct estado
 } estado;
 
 
-void printCurrent(vector <int> V, int tamanho){
+void printCurrent(vector <int> &V){
     cout << "================";
     for(int i=0; i<V.size(); i++){
         if(i%tamanho == 0)
@@ -22,6 +23,14 @@ void printCurrent(vector <int> V, int tamanho){
         cout << " " << V[i] << " ";
     }
     cout << endl;
+}
+
+size_t hashVector(vector <int> &v) {
+    size_t seed = v.size();
+    for(auto& i: v) {
+        seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
 }
 
 bool verifyCompletion(vector <int> V){
@@ -32,15 +41,7 @@ bool verifyCompletion(vector <int> V){
     return true;
 }
 
-bool verifyCompletion2(vector <int> V){
-    for(int i=0; i<V.size(); i++){
-        if(V[i] != i+1 ||(i==V.size()-1 && V[i] != 0))
-            return false;
-    }
-    return true;
-}
-
-vector <estado> possibleMoves(estado V, int tamanho){
+vector <estado> possibleMoves(estado &V){
 	vector <estado> moves;
     for(int i=0; i<V.state.size(); i++){
         int line = i / tamanho;
@@ -70,22 +71,20 @@ vector <estado> possibleMoves(estado V, int tamanho){
                 iter_swap(novo.state.begin() + i, novo.state.begin() + i+1);
 			    moves.push_back(novo);
             }
-            break;
+            
         }
     }
 	return moves;
 }
 
-bool verifySeen(vector <int> state, vector <vector <int>> seen) {
-	for(vector <int> v: seen) {
-		if(equal(state.begin(), state.end(), v.begin())){
-			return true;
-        }
-	}
+bool verifySeen(vector <int> &state, unordered_set <size_t> &seen) {
+    if(seen.find(hashVector(state)) != seen.end()) {
+        return true;
+    }
 	return false;
 }
-     
-int distancia(estado est) {
+
+int distancia(estado &est) {
     int dist = 0;
     for(int i = 0; i < tamanho * tamanho; i++) {
         if(est.state[i] != 0){
@@ -99,62 +98,44 @@ int distancia(estado est) {
     return dist;
 }
 
-int conflito(vector<int> est){
-    int conflitos = 0;
-    // verficar se tem conflito na coluna
-    for (int i =0; i<tamanho; i++){
-        for(int j = i; j<tamanho*tamanho; j+=tamanho){
-            // verificar se os dois números devem estar nessa coluna
-            if(est[i] % tamanho == i && est[j] % tamanho == i){
-                // verificar se ha conflito
-                if(est[i] > est[j]){
-                    conflitos ++;
-                }
-            }
-        }
-    }
-
-    return conflitos;
-}
-/*
 struct compare
 {
-    bool operator()(const estado & a, const estado & b)
+    bool operator()(estado & a, estado & b)
     {
-        return distancia(a) + a.sequencia.size() + 2 * conflito(a.state) > distancia(b) + b.sequencia.size() + 2 * conflito(b.state);
+        return distancia(a) + a.sequencia.size() > distancia(b) + b.sequencia.size();
     }
 };
 
-estado solve(vector <int> puzzle, int tamanho) {
-	vector <vector <int>> seen{puzzle};
+estado solve(vector <int> &puzzle) {
+	unordered_set <size_t> seen{hashVector(puzzle)};
 	priority_queue <estado, vector<estado>, compare> queue;
     estado base = {puzzle, ""};
     queue.push(base);
+
 	while(queue.size() > 0) {
 		estado current = queue.top();
 		queue.pop();
 
-        cout << "Profundidade: " << current.sequencia.size() << endl;
+        //cout << "Profundidade: " << current.sequencia.size() << endl;
 
 		if (verifyCompletion(current.state)) {
 			return current;
 		}
-		for (estado neighbour: possibleMoves(current, tamanho)) {
-			if (!verifySeen(neighbour.state, seen)) {
-				seen.push_back(neighbour.state);
-				queue.push(neighbour);
+
+        vector <estado> neighbours = possibleMoves(current);
+		for (int i = 0; i < neighbours.size(); i++) {
+			if (!verifySeen(neighbours[i].state, seen)) {
+				seen.insert(hashVector(neighbours[i].state));
+				queue.push(neighbours[i]);
 			}
 		}
 	}
 
-    estado est;
-    est.sequencia = "";
+    estado est{vector <int>(), ""};
     return est;
 }
-*/
 
-int main(){
-    cout << "Digite o tamanho da matriz" << endl;
+int main(){	
     cin >> tamanho >> tamanho;
 
 	vector <int> E(tamanho * tamanho);
@@ -162,11 +143,10 @@ int main(){
         cin >> E[i];
     }
 
-    cout << conflito(E) << endl;
-	//estado solution = solve(E, tamanho);
+	estado solution = solve(E);
 
-	//printCurrent(solution.state, tamanho);
-    //cout << endl << "Movimentos necessários: " << solution.sequencia.size() << endl;
-	//cout << "Sequência: " << solution.sequencia << endl;
+	printCurrent(solution.state);
+    cout << endl << "Movimentos necessários: " << solution.sequencia.size() << endl;
+	cout << "Sequência: " << solution.sequencia << endl;
     return 0;
 }
