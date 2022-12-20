@@ -11,7 +11,7 @@ int tamanho;
 typedef struct estado
 {
     vector <int> state;
-    string sequencia;
+    string sequence;
 } estado;
 
 
@@ -20,14 +20,46 @@ void printCurrent(vector <int> &V){
     for(int i=0; i<V.size(); i++){
         if(i%tamanho == 0)
             cout << endl;
-        cout << " " << V[i] << " ";
+        cout << " ";
+        if(V[i] < 10) {
+            cout << "0";
+        }
+        cout << V[i] << " ";
     }
     cout << endl;
 }
 
-size_t hashVector(vector <int> &v) {
-    size_t seed = v.size();
-    for(auto& i: v) {
+void printSolution(vector <int> V, string sequence) {
+    int pos;
+    for(int i = 0; i < V.size(); i++) {
+        if(V[i] == 0) {
+            pos = i;
+            break;
+        }
+    }
+
+    printCurrent(V);
+    for(char c: sequence) {
+        if(c == 'C') {
+            iter_swap(V.begin() + pos, V.begin() + pos - tamanho);
+            pos = pos - tamanho;
+        } else if(c == 'B') {
+            iter_swap(V.begin() + pos, V.begin() + pos + tamanho);
+            pos = pos + tamanho;
+        } else if(c == 'E') {
+            iter_swap(V.begin() + pos, V.begin() + pos-1);
+            pos = pos - 1;
+        } else if(c == 'D'){
+            iter_swap(V.begin() + pos, V.begin() + pos+1);
+            pos = pos + 1;
+        }
+        printCurrent(V);
+    }
+}
+
+size_t hashVector(vector <int> &V) {
+    size_t seed = V.size();
+    for(auto& i: V) {
         seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
     return seed;
@@ -49,25 +81,25 @@ vector <estado> possibleMoves(estado &V){
         if(V.state[i] == 0){
             if(line != 0) {
                 // Cima
-                estado novo = {V.state, V.sequencia+"C"};
+                estado novo = {V.state, V.sequence+"C"};
                 iter_swap(novo.state.begin() + i, novo.state.begin() + i - tamanho);
 			    moves.push_back(novo);
             }
             if (line != tamanho-1){
                 // Baixo
-                estado novo = {V.state, V.sequencia+"B"};
+                estado novo = {V.state, V.sequence+"B"};
                 iter_swap(novo.state.begin() + i, novo.state.begin() + i + tamanho);
 			    moves.push_back(novo);
             } 
             if (column != 0) {
                 // Esquerda
-                estado novo = {V.state, V.sequencia+"E"};
+                estado novo = {V.state, V.sequence+"E"};
                 iter_swap(novo.state.begin() + i, novo.state.begin() + i-1);
 			    moves.push_back(novo);
             }
             if (column != tamanho-1) {
                 // Direita
-                estado novo = {V.state, V.sequencia+"D"};
+                estado novo = {V.state, V.sequence+"D"};
                 iter_swap(novo.state.begin() + i, novo.state.begin() + i+1);
 			    moves.push_back(novo);
             }
@@ -102,7 +134,8 @@ struct compare
 {
     bool operator()(estado & a, estado & b)
     {
-        return distancia(a) + a.sequencia.size() > distancia(b) + b.sequencia.size();
+        // g() + h()
+        return distancia(a) + a.sequence.size() > distancia(b) + b.sequence.size();
     }
 };
 
@@ -115,8 +148,6 @@ estado solve(vector <int> &puzzle) {
 	while(queue.size() > 0) {
 		estado current = queue.top();
 		queue.pop();
-
-        //cout << "Profundidade: " << current.sequencia.size() << endl;
 
 		if (verifyCompletion(current.state)) {
 			return current;
@@ -145,8 +176,8 @@ int main(){
 
 	estado solution = solve(E);
 
-	printCurrent(solution.state);
-    cout << endl << "Movimentos necessários: " << solution.sequencia.size() << endl;
-	cout << "Sequência: " << solution.sequencia << endl;
+    printSolution(E, solution.sequence);
+    cout << endl << "Número de movimentos: " << solution.sequence.size() << endl;
+	cout << "Sequência: " << solution.sequence << endl;
     return 0;
 }
