@@ -73,12 +73,23 @@ int main() {
     }
     cout << ">= " << somaCores << ";" << endl;
 
+    // 4
     for(int i = 0; i < m; i++) {
         for(int j = 0; j < n; j++) {
             cout << "+" << maquinasVirtuais[j].ram << " ~x" << matriz[i][j] << " ";
         }
         cout << "+" << maquinas[i].ram << " x" << i + 1;
         cout << " >= " << somaRam << ";" << endl;
+    }
+
+
+    // 5
+    for(int i = 0; i < m; i++) {
+        for(int j = 0; j < n; j++) {
+            cout << "+" << maquinasVirtuais[j].cores << " ~x" << matriz[i][j] << " ";
+        }
+        cout << "+" << maquinas[i].cores << " x" << i + 1;
+        cout << " >= " << somaCores << ";" << endl;
     }
     return 0;
 }
