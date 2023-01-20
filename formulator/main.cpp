@@ -47,8 +47,9 @@ int main() {
         matriz.push_back(v);
     }
 
+    cout << "* #variable= " << m * n + m << " #constraint= " << 2 + 2 * n + 2 * m << endl;
+
     // 1
-    cout << "* #variable= " << m * n + m << " #constraint= " << "TODO" << endl;
     cout << "min:";
     for(int i = 1; i <= m; i++) {
         cout << " +1 x" << i;
@@ -91,5 +92,20 @@ int main() {
         cout << "+" << maquinas[i].cores << " x" << i + 1;
         cout << " >= " << somaCores << ";" << endl;
     }
+
+    // 6
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j ++) {
+            cout << "+1 x" << matriz[j][i] << " ";
+        }
+        cout << ">= 1;" << endl;
+        for(int j = 0; j < m; j ++) {
+            cout << "+1 ~x" << matriz[j][i] << " ";
+        }
+        cout << ">= " << m - 1 << ";" << endl;
+    }
+
+    cout << "* #variable= " << m * n + m << " #constraint= " << 2 + 2 * n + 2 * m << endl;
+
     return 0;
 }
