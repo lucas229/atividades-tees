@@ -49,7 +49,7 @@ int main() {
 
     cout << "* #variable= " << m * n + m << " #constraint= " << 2 + 2 * n + 2 * m << endl;
 
-    // 1
+    // Formula 1
     cout << "min:";
     for(int i = 1; i <= m; i++) {
         cout << " +1 x" << i;
@@ -62,19 +62,19 @@ int main() {
         somaCores += maquinasVirtuais[i].cores;
     }
 
-    // 2
+    // Formula 2
     for(int i = 0; i < m; i++) {
         cout << "+" << maquinas[i].ram << " x" << i + 1 << " ";
     }
     cout << ">= " << somaRam << ";" << endl;
 
-    // 3
+    // Formula 3
     for(int i = 0; i < m; i++) {
         cout << "+" << maquinas[i].cores << " x" << i + 1 << " ";
     }
     cout << ">= " << somaCores << ";" << endl;
 
-    // 4
+    // Formula 4
     for(int i = 0; i < m; i++) {
         for(int j = 0; j < n; j++) {
             cout << "+" << maquinasVirtuais[j].ram << " ~x" << matriz[i][j] << " ";
@@ -84,7 +84,7 @@ int main() {
     }
 
 
-    // 5
+    // Formula 5
     for(int i = 0; i < m; i++) {
         for(int j = 0; j < n; j++) {
             cout << "+" << maquinasVirtuais[j].cores << " ~x" << matriz[i][j] << " ";
@@ -93,7 +93,7 @@ int main() {
         cout << " >= " << somaCores << ";" << endl;
     }
 
-    // 6
+    // Formula 6
     for(int i = 0; i < n; i++) {
         for(int j = 0; j < m; j ++) {
             cout << "+1 x" << matriz[j][i] << " ";
