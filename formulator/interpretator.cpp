@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
                     
                     if(item[0] != '-' && num <= hw) {
                         cout << "Hardware " << sub << " ligado" << endl;
+                        count++;
                     }
                     else if(item[0] != '-'){
                         cout << "Maquina " << nCol+1 << " alocada no Hardware " << nLinha+1 << endl;
@@ -47,6 +48,7 @@ int main(int argc, char **argv) {
             }
         }
     }
+    cout << "Total de Hardwares ligados: " << count << endl;
 
     return 0;
 }
